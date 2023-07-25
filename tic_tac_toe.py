@@ -2,8 +2,8 @@
 # July 19, 2023
 
 import user
-import computer
-import smart_computer
+import easy_computer
+import hard_computer
 import view
 
 # Main Function
@@ -16,11 +16,11 @@ def tic_tac_toe():
 
     difficulty = input("Easy or Hard?")
     if difficulty == "Easy":
-        comp = computer.Computer()
+        comp = easy_computer.Computer()
     elif difficulty == "Hard":
-        comp = smart_computer.Smart_Computer()
+        comp = hard_computer.Hard_Computer()
     else:
-        comp = computer.Computer()
+        comp = easy_computer.Computer()
     
     while not game_over:
         view.print_grid(grid)
