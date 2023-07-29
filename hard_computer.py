@@ -1,4 +1,4 @@
-from computer import Computer
+from easy_computer import Computer
 import random
 class Smart_Computer(Computer):
 
@@ -17,7 +17,7 @@ class Smart_Computer(Computer):
             if self.smart_helper(row):
                 for cell in row:
                     if type(cell) == int:
-                        return cell
+                        return cell-1
     
         return Computer.valid_move(self, grid)
 

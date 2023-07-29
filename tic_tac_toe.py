@@ -1,75 +1,65 @@
-# George ElMassih
+# George ElMassih (also bennett gillig)
 # July 19, 2023
 
 import user
-import easy_computer
 import hard_computer
 import view
 
-# Main Function
-# Plays Tic-Tac-Toe
-def tic_tac_toe():
-    # Initialize the empty grid
-    grid = init_grid()
-    game_over = False
-    player = user.User()
-
-    difficulty = input("Easy or Hard?")
-    if difficulty == "Easy":
-        comp = easy_computer.Computer()
-    elif difficulty == "Hard":
-        comp = hard_computer.Hard_Computer()
-    else:
-        comp = easy_computer.Computer()
-    
-    while not game_over:
-        view.print_grid(grid)
-        # Accept user input
-        player_move = player.valid_input(grid)
-        # Place user's X on grid
-        place_marker(grid, player_move, "X")
-
-        # Generate a random computer move
-        computer_move = comp.valid_move(grid)
-        # Place computer's O on grid
-        grid = place_marker(grid, computer_move, "o")
-        
-        # Check if someone has won the game
-        game_over = check_win(grid)
-        
-    # Game has ended
-    if game_over == "X":
-        print("Congrats! You won!")
-    elif game_over == "o":
-        print("Oh no! You lost!")
-    else:
-        print("There's been a stalemate!")
-
-# Helper Funcions
+import tkinter as tk
 
 # Make a new empty grid
 def init_grid():
     return list(range(1,10))
 
 # Place markers on the grid
-def place_marker(grid, index, symbol):
-    grid[index-1] = symbol
-    return grid
+def place_marker(buttons, grid, index, symbol):
+    buttons[index].config(text=symbol)
+    grid[index] = symbol
+    
+def user_move(buttons, status, computer, grid, index):
+    print(index)
+    
+    # check if I can place
+    if not ("X" != grid[index] != "O"):
+        status.config(text=f"Cannot click thingy {index+1}")
+        return
+        
+    # place
+    place_marker(buttons, grid, index, "O")
 
+    # check win and draw
+    if check_win(grid, status): return
+    
+    # do computer
+    move = computer.valid_move(grid)
+    print(move)
+    place_marker(buttons, grid, move, "X")
+    
+    # check win and draw
+    if check_win(grid, status): return
+    
+    status.config(text=f"Clicked thingy {index+1}")
+    
 # Check if somebody won
-def check_win(grid):
+def check_win(grid, status):
+    win = winning_row(grid[0:3]) or \
+    winning_row(grid[3:6]) or \
+    winning_row(grid[6:9]) or \
+    winning_row(grid[0:9:3]) or \
+    winning_row(grid[1:9:3]) or \
+    winning_row(grid[2:9:3]) or \
+    winning_row(grid[0:9:4]) or \
+    winning_row(grid[2:7:2])
+    if win:
+        status.config(text=f"{win}s win!")
+        return True
+        
     if stalemate(grid):
-        return "Draw"
-    else:
-        win = winning_row(grid[0:3]) or \
-        winning_row(grid[3:6]) or \
-        winning_row(grid[6:9]) or \
-        winning_row(grid[0:9:3]) or \
-        winning_row(grid[1:9:3]) or \
-        winning_row(grid[2:9:3]) or \
-        winning_row(grid[0:9:4]) or \
-        winning_row(grid[2:7:2])
-        return win
+        status.config(text="It's a draw!")
+        return True
+        
+    return False
+    
 
 # Check for a stalemate
 def stalemate(grid):
@@ -83,4 +73,24 @@ def winning_row(row):
         return False
 
 if __name__ == "__main__":
-    tic_tac_toe()
+    root = tk.Tk()
+    root.geometry("150x150")
+    root.title("tic-tac-toe")
+    
+    status = tk.Label(root, text="Pick a square")
+    status.pack()
+    
+    frame = tk.Frame(root)
+    frame.pack()
+    
+    computer = hard_computer.Smart_Computer()
+    grid = [*range(1,10)]
+
+    buttons = []
+    for i in range(9):
+        command = lambda i=i: user_move(buttons, status, computer, grid, i)
+        buttons.append(tk.Button(frame, text=i, command=command))
+        buttons[i].grid(row=i//3, column=i%3, padx=5, pady=5)
+        
+    
+    root.mainloop()
